@@ -1,0 +1,50 @@
+{
+  "questions": [
+    {
+      "tense": "present_simple",
+      "questionType": "multiple_choice",
+      "difficulty": 1,
+      "content": "Every Friday, my cousin ____ chess after school.",
+      "options": [
+        {
+          "text": "plays",
+          "errorCode": null
+        },
+        {
+          "text": "play",
+          "errorCode": "E01"
+        },
+        {
+          "text": "playing",
+          "errorCode": null
+        }
+      ],
+      "correctAnswer": "plays",
+      "explanationVi": "My cousin là chủ ngữ số ít, nên động từ play thêm s thành plays.",
+      "grammarRule": "Chủ ngữ ngôi thứ ba số ít đi với động từ thêm s hoặc es.",
+      "errorCode": "E01"
+    },
+    {
+      "tense": "past_simple",
+      "questionType": "fill_in_blank",
+      "difficulty": 1,
+      "content": "Last Saturday, our family ____ (visit) a museum.",
+      "options": [],
+      "correctAnswer": "visited",
+      "explanationVi": "Last Saturday là thời gian đã qua, nên dùng dạng quá khứ visited.",
+      "grammarRule": "Động từ có quy tắc ở quá khứ đơn thêm ed.",
+      "errorCode": "E04"
+    },
+    {
+      "tense": "present_continuous",
+      "questionType": "error_correction",
+      "difficulty": 1,
+      "content": "Look! The children is playing in the schoolyard.",
+      "options": [],
+      "correctAnswer": "Look! The children are playing in the schoolyard.",
+      "explanationVi": "The children là chủ ngữ số nhiều, nên dùng are playing thay cho is playing.",
+      "grammarRule": "Chủ ngữ số nhiều đi với are trong thì hiện tại tiếp diễn.",
+      "errorCode": "E01"
+    }
+  ]
+}

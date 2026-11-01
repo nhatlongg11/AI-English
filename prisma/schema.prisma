@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+}
+model Topic {
+  id        String @id
+  nameVi    String
+  skills    Skill[]
+}
+model ErrorCategory {
+  code      String @id
+  nameVi    String
+  skills    Skill[]
+}
+model Skill {
+  id        String @id
+  topicId   String
+  errorCode String
+  topic     Topic @relation(fields: [topicId], references: [id])
+  error     ErrorCategory @relation(fields: [errorCode], references: [code])
+  questions Question[]
+  @@unique([topicId, errorCode])
+}
+model Question {
+  id               String @id @default(uuid())
+  skillId          String
+  skill            Skill @relation(fields: [skillId], references: [id])
+  tense            String
+  difficulty       Int
+  questionType     String
+  content          String
+  contentHash      String @unique
+  correctAnswer    String
+  explanationVi    String
+  grammarRule      String
+  errorCode        String
+  options          AnswerOption[]
+  provenance       String
+  model            String
+  promptVersion    String
+  createdBy        String?
+  generatedAt      DateTime @default(now())
+  validationStatus String @default("passed_deterministic_checks")
+  reviewFlags      String
+  status           String @default("draft")
+  reviewedBy       String?
+  reviewedAt       DateTime?
+  reviewNote       String?
+  attempts         Attempt[]
+  decisions        SelectionDecision[]
+  exerciseQuestions ExerciseQuestion[]
+}
+model AnswerOption {
+  id         String @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  position   Int
+  text       String
+  errorCode  String?
+  @@unique([questionId, position])
+}
+model Student {
+  id              String @id @default(uuid())
+  tokenHash       String @unique
+  experimentGroup String
+  mode            String
+  teacherId       String?
+  displayName     String?
+  className       String?
+  createdAt       DateTime @default(now())
+  attempts        Attempt[]
+  mastery         MasterySnapshot[]
+  decisions       SelectionDecision[]
+  attendance      AttendanceRecord[]
+  exercises       ExerciseRecipient[]
+  aiSupport       AiSupportCache[]
+  @@index([teacherId])
+}
+model Attempt {
+  id                String @id @default(uuid())
+  studentId         String
+  student           Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  questionId        String
+  question          Question @relation(fields: [questionId], references: [id])
+  decisionId        String @unique
+  decision          SelectionDecision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  answer            String
+  correct           Boolean?
+  errorCode         String?
+  diagnosis         String
+  gradingSource     String
+  mode              String
+  createdAt         DateTime @default(now())
+  @@index([studentId, createdAt])
+}
+model MasterySnapshot {
+  id              String @id @default(uuid())
+  studentId       String
+  student         Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skillId         String
+  tense           String
+  errorCode       String
+  attempts        Int
+  recentAccuracy  Float
+  mastery         Float
+  recentErrors    Int
+  difficulty      Int
+  lastPracticedAt DateTime
+  @@unique([studentId, skillId])
+}
+model SelectionDecision {
+  id          String @id @default(uuid())
+  studentId   String
+  student     Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  questionId  String?
+  question    Question? @relation(fields: [questionId], references: [id])
+  mode        String
+  algorithm   String
+  reason      String
+  generationRequest String?
+  exerciseId  String?
+  exercise    Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  attempt     Attempt?
+  @@index([studentId, createdAt])
+  @@unique([exerciseId, studentId, questionId])
+}
+model AttendanceLesson {
+  id        String @id @default(uuid())
+  title     String
+  heldOn    String
+  createdBy String
+  createdAt DateTime @default(now())
+  records   AttendanceRecord[]
+  @@index([createdBy, heldOn])
+}
+model AttendanceRecord {
+  lessonId String
+  studentId String
+  lesson AttendanceLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status String @default("unmarked")
+  markedBy String?
+  markedAt DateTime?
+  @@id([lessonId, studentId])
+}
+model Exercise {
+  id String @id @default(uuid())
+  title String
+  instructions String
+  createdBy String
+  createdAt DateTime @default(now())
+  publishedAt DateTime?
+  questions ExerciseQuestion[]
+  recipients ExerciseRecipient[]
+  decisions SelectionDecision[]
+  @@index([createdBy, createdAt])
+}
+model ExerciseQuestion {
+  exerciseId String
+  questionId String
+  position Int
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+  @@id([exerciseId, questionId])
+  @@unique([exerciseId, position])
+}
+model ExerciseRecipient {
+  exerciseId String
+  studentId String
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  @@id([exerciseId, studentId])
+}
+model AiUsage {
+  id                String @id @default(uuid())
+  operation         String
+  model             String
+  provenance        String
+  status            String
+  inputTokens       Int @default(0)
+  outputTokens      Int @default(0)
+  estimatedCostUsd  Float
+  reservedCostUsd   Float
+  priceInput        Float
+  priceOutput       Float
+  usageEstimated    Boolean @default(false)
+  createdAt         DateTime @default(now())
+  @@index([createdAt])
+}
+model DiagnosisCache {
+  key       String @id
+  result    String
+  expiresAt DateTime
+}
+model AiSupportCache {
+  key String @id
+  operation String
+  studentId String?
+  student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staffId String?
+  result String
+  context String
+  model String
+  provenance String
+  createdAt DateTime @default(now())
+  @@index([studentId, operation, createdAt])
+  @@index([staffId, operation, createdAt])
+}

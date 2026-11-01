@@ -1,0 +1,205 @@
+# VS Code REST Client / JetBrains HTTP Client. Replace tokens and IDs locally.
+@baseUrl = http://127.0.0.1:3000/api/v1
+@adminToken = replace-with-admin-token
+@teacherToken = replace-with-teacher-token
+@studentToken = replace-with-student-token
+@studentId = replace-with-created-student-id
+@questionId = replace-with-generated-question-id
+@decisionId = replace-with-selection-decision-id
+@attemptId = replace-with-submitted-attempt-id
+@lessonId = replace-with-created-lesson-id
+@exerciseId = replace-with-created-exercise-id
+
+### Health
+GET {{baseUrl}}/health
+
+### Resolve the authenticated role; no credentials returned
+GET {{baseUrl}}/auth/session
+Authorization: Bearer {{studentToken}}
+
+### Student dashboard counters, activity, mastery and availability
+GET {{baseUrl}}/learning/students/{{studentId}}/summary
+Authorization: Bearer {{studentToken}}
+
+### Sentence Builder assignment with shuffled stable word-token IDs
+GET {{baseUrl}}/learning/students/{{studentId}}/next-question?questionType=error_correction
+Authorization: Bearer {{studentToken}}
+
+### Recover a result only after this student has submitted this decision
+GET {{baseUrl}}/learning/assignments/{{decisionId}}/result
+Authorization: Bearer {{studentToken}}
+
+### Generate drafts (primary by default)
+POST {{baseUrl}}/ai/questions/generate
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"tense":"present_simple","difficulty":1,"questionType":"multiple_choice","count":3}
+
+### Review draft bank (includes answer keys; teachers/admin only)
+GET {{baseUrl}}/ai/questions?status=draft&limit=30
+Authorization: Bearer {{teacherToken}}
+
+### Create a teacher-authored draft without AI
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"tense":"present_simple","difficulty":1,"questionType":"fill_in_blank","content":"Every afternoon, Nam ____ (play) chess with his sister.","options":[],"correctAnswer":"plays","explanationVi":"Nam là chủ ngữ ngôi thứ ba số ít nên play thêm s thành plays.","grammarRule":"Ngôi thứ ba số ít ở hiện tại đơn dùng động từ thêm s hoặc es.","errorCode":"E01"}
+
+### Preview the JSON template; this does not write questions
+POST {{baseUrl}}/questions/import/preview
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+< ../docs/templates/tenselab-questions.json
+
+### Import the template as drafts; duplicate skipping defaults to true
+POST {{baseUrl}}/questions/import
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+< ../docs/templates/tenselab-questions.json
+
+### Human reviewer must inspect grammar, single-answer semantics and error mappings first
+POST {{baseUrl}}/ai/questions/{{questionId}}/approve
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"note":"Đã kiểm tra ngữ pháp, đáp án duy nhất và ánh xạ lỗi.","checkedGrammarAndAnswer":true}
+
+### Reject draft
+POST {{baseUrl}}/ai/questions/{{questionId}}/reject
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"note":"Câu hỏi còn có nhiều cách hiểu, cần viết lại."}
+
+### Provision anonymous student (token returned ONCE; save it securely)
+POST {{baseUrl}}/learning/students
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"mode":"adaptive","experimentGroup":"A"}
+
+### Approved assignment without answer key
+GET {{baseUrl}}/learning/students/{{studentId}}/next-question
+Authorization: Bearer {{studentToken}}
+
+### Submit only the option text, missing words or corrected sentence
+POST {{baseUrl}}/learning/attempts
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{"decisionId":"{{decisionId}}","answer":"walks"}
+
+### Persisted mastery
+GET {{baseUrl}}/learning/students/{{studentId}}/mastery
+Authorization: Bearer {{studentToken}}
+
+### Reuse diagnosis from a submitted attempt
+POST {{baseUrl}}/ai/diagnose
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{"attemptId":"{{attemptId}}"}
+
+### Staff generation needs
+GET {{baseUrl}}/ai/content-needs
+Authorization: Bearer {{teacherToken}}
+
+### Usage / cost (UTC budget day)
+GET {{baseUrl}}/ai/usage
+Authorization: Bearer {{adminToken}}
+
+### Research export (raw answers and personal details excluded)
+GET {{baseUrl}}/research/export?format=csv&limit=1000&offset=0
+Authorization: Bearer {{adminToken}}
+
+### Delete student's attempts, mastery, decisions and credential
+DELETE {{baseUrl}}/learning/students/{{studentId}}
+Authorization: Bearer {{studentToken}}
+
+### Teacher roster, including students with no attempts
+GET {{baseUrl}}/learning/students?limit=100&offset=0
+Authorization: Bearer {{teacherToken}}
+
+### Teacher-scoped learning report
+GET {{baseUrl}}/learning/reports?format=json&limit=1000&offset=0
+Authorization: Bearer {{teacherToken}}
+
+### Admin: available teachers
+GET {{baseUrl}}/learning/teachers
+Authorization: Bearer {{adminToken}}
+
+### Admin: assign an existing learner (replace teacher actor ID locally)
+PATCH {{baseUrl}}/learning/students/{{studentId}}/teacher
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"teacherId":"local-seed-teacher"}
+
+### Create a lesson register (starts unmarked; teacher's own students only)
+POST {{baseUrl}}/teaching/lessons
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"title":"Ôn hiện tại đơn — buổi 1","heldOn":"2026-10-28","studentIds":["{{studentId}}"]}
+
+### Explicit lesson attendance
+PATCH {{baseUrl}}/teaching/lessons/{{lessonId}}/attendance
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"records":[{"studentId":"{{studentId}}","status":"present"}]}
+
+### Save an exercise draft
+POST {{baseUrl}}/teaching/exercises
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"title":"Bài tập hiện tại đơn","instructions":"Đọc kỹ câu hỏi nhé.","questionIds":["{{questionId}}"],"studentIds":["{{studentId}}"]}
+
+### Assign only after all questions have administrator approval
+POST {{baseUrl}}/teaching/exercises/{{exerciseId}}/publish
+Authorization: Bearer {{teacherToken}}
+
+### Student: their assigned exercises and progress
+GET {{baseUrl}}/learning/exercises
+Authorization: Bearer {{studentToken}}
+
+### Student: get the next unanswered exercise question, then submit its decisionId
+GET {{baseUrl}}/learning/exercises/{{exerciseId}}/next-question
+Authorization: Bearer {{studentToken}}
+
+### AI personal study plan from this student's stored progress
+POST {{baseUrl}}/ai/study-plan
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{"days":3,"minutesPerDay":10}
+
+### AI explanation for this student's submitted attempt only
+POST {{baseUrl}}/ai/answer-explanation
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{"attemptId":"{{attemptId}}"}
+
+### AI teacher lesson plan; does not publish or assign any question
+POST {{baseUrl}}/ai/lesson-plan
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{"tense":"present_simple","difficulty":1,"minutes":30,"focusError":null}
+
+### AI teaching suggestions scoped to this teacher's students
+POST {{baseUrl}}/ai/class-insights
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
+
+{}
+
+### Saved study plans; opening this does not call Gemini
+GET {{baseUrl}}/ai/support/history?kind=study_plan
+Authorization: Bearer {{studentToken}}

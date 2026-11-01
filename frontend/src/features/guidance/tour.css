@@ -1,0 +1,85 @@
+.shepherd-element.tenselab-tour {
+  width: min(390px, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  color: var(--foreground);
+  background: var(--card);
+  box-shadow: 0 20px 70px #29334726, 0 0 0 5px #eeeafb66;
+  font-family: inherit;
+}
+.tenselab-tour .shepherd-content {max-height: calc(100dvh - 32px);overflow-y: auto;border-radius:inherit;}
+.tenselab-tour.shepherd-has-title .shepherd-content .shepherd-header {
+  padding: 22px 22px 14px;
+  background: var(--lavender);
+  border-radius: 21px 21px 0 0;
+  gap: 12px;
+  align-items: start;
+}
+.tenselab-tour .shepherd-title {
+  flex: 1 1 auto;
+  color: var(--foreground);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.3px;
+}
+.tenselab-tour .shepherd-text {
+  padding: 17px 22px 22px;
+  color: var(--foreground);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.tenselab-tour .shepherd-text .tour-progress {
+  color: var(--secondary-foreground);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.tenselab-tour .shepherd-footer {
+  padding: 0 18px 18px;
+  gap: 7px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.tenselab-tour .shepherd-button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 12px;
+  min-height: 42px;
+  padding: 9px 13px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  margin: 0;
+  transition: background .15s;
+}
+.tenselab-tour .shepherd-button:not(:disabled):hover {background: var(--secondary-foreground);color: white;}
+.tenselab-tour .shepherd-button-secondary {background: var(--secondary);color: var(--secondary-foreground);}
+.tenselab-tour .shepherd-button-secondary:not(:disabled):hover {background: var(--lavender);color: var(--foreground);}
+.tenselab-tour .shepherd-button.tour-skip {margin-right: auto;background: transparent;color: var(--muted-foreground);padding-inline: 5px;}
+.tenselab-tour .shepherd-button.tour-skip:hover {color: var(--foreground);background: var(--muted);}
+.tenselab-tour.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+  flex-shrink: 0;
+  color: var(--secondary-foreground);
+  font-size: 27px;
+  line-height: 1;
+  width: 30px;
+  min-height: 30px;
+  border-radius: 8px;
+}
+.tenselab-tour.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {background: #fff8;color: var(--foreground);}
+.tenselab-tour .shepherd-arrow:before {background: var(--card);}
+.tenselab-tour.shepherd-has-title[data-popper-placement^=bottom] > .shepherd-arrow:before {background: var(--lavender);}
+.shepherd-modal-overlay-container.shepherd-modal-is-visible {fill: #293347;opacity: .42;}
+.tenselab-tour :focus-visible {outline: 3px solid var(--ring);outline-offset: 3px;}
+@media (max-width: 480px) {
+  .tenselab-tour .shepherd-title {font-size: 17px;}
+  .tenselab-tour.shepherd-has-title .shepherd-content .shepherd-header {padding: 18px 18px 12px;}
+  .tenselab-tour .shepherd-text {padding: 14px 18px 18px;}
+  .tenselab-tour .shepherd-button {font-size: 11px;padding-inline: 10px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .tenselab-tour, .tenselab-tour *, .shepherd-modal-overlay-container {transition: none !important;}
+}
