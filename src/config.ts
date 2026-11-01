@@ -6,6 +6,8 @@ const price = z.preprocess(v => v === '' ? undefined : v, z.coerce.number().nonn
 const envSchema = z.object({
   DATABASE_URL: z.string().default('file:./prisma/dev.db'),
   HOST: z.string().default('127.0.0.1'), PORT: positive(3000),
+  // Comma-separated trusted proxy IPs/CIDRs; disabled for direct local use.
+  TRUST_PROXY: z.string().default(''),
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_PRIMARY_MODEL: z.string().default('gemini-3.5-flash-lite'),
   GEMINI_ADVANCED_MODEL: z.string().default('gemini-3.8-flash'),

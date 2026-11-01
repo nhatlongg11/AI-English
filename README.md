@@ -1,5 +1,9 @@
 # TenseLab AI Core
 
+**Docker deployment:** run `docker compose up -d --build` with your configured `.env`.
+The frontend is available at `http://127.0.0.1:8080`; SQLite data persists in a named
+volume. See [deployment, database import, and backups](docs/DEPLOYMENT.md).
+
 **AI hỗ trợ học và dạy:** Kế hoạch ôn tập cá nhân, giải thích sau khi nộp câu, giáo án theo thời lượng và gợi ý ôn tập từ kết quả học sinh. Dùng Gemini thật, cache, phân quyền và ngân sách hiện có; không tự duyệt câu hoặc đổi điểm. Xem [cách dùng và API](docs/AI_SUPPORT.md).
 
 **Điểm danh & giao bài:** Giáo viên có sổ điểm danh từng buổi, tự soạn/chọn câu để tạo bài và giao cho học sinh. Học sinh mở **Bài thầy cô giao** để làm và lưu tiến độ. Câu hỏi vẫn cần admin duyệt. Xem [cách dùng và API](docs/CLASSROOM.md).

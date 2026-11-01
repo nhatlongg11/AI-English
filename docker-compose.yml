@@ -1,0 +1,75 @@
+name: tenselab
+
+services:
+  init:
+    build:
+      context: .
+      target: tools
+    env_file:
+      - path: .env
+        format: raw
+    environment:
+      DATABASE_URL: file:/app/data/tenselab.db
+    volumes:
+      - app-data:/app/data
+    command: ["sh", "-c", "npm run db:migrate && node dist/scripts/seed.js"]
+    restart: "no"
+    init: true
+
+  api:
+    build:
+      context: .
+      target: api
+    env_file:
+      - path: .env
+        format: raw
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3000"
+      DATABASE_URL: file:/app/data/tenselab.db
+      # The API is reachable only inside this stack. Nginx replaces forwarded IPs.
+      TRUST_PROXY: uniquelocal
+    volumes:
+      - app-data:/app/data
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/v1/health', {signal: AbortSignal.timeout(4000)}).then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build:
+      context: .
+      target: web
+    ports:
+      - "${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-8080}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  app-data:

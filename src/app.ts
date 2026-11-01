@@ -42,6 +42,7 @@ export async function buildApp(
   const config = options.config ?? loadConfig();
   const db = options.db ?? createDb(config.DATABASE_URL);
   const app = Fastify({
+    trustProxy: config.TRUST_PROXY || false,
     bodyLimit: 16384,
     logger: { redact: ["req.headers.authorization"] },
     logController: new LogController({ disableRequestLogging: true }),
