@@ -39,11 +39,16 @@ describe('attendance and assigned exercise screens',()=>{
     vi.spyOn(ApiClient.prototype,'exercises').mockResolvedValue({exercises:[],nextOffset:null});
     const save=vi.spyOn(ApiClient.prototype,'saveExercise').mockResolvedValue({exercise});
     vi.spyOn(ApiClient.prototype,'exercise').mockResolvedValue({exercise});const publish=vi.spyOn(ApiClient.prototype,'publishExercise').mockResolvedValue({exercise});
-    mount(<Exercises/>);const user=userEvent.setup();await user.type(screen.getByLabelText('Tên bài tập'),'Bài tập tuần 1');
+    mount(<Exercises/>);const user=userEvent.setup();await user.click(screen.getByRole('button',{name:'Tạo bài tập mới'}));
+    await user.click(await screen.findByRole('checkbox',{name:/Minh Anh/}));
+    await user.click(screen.getByRole('button',{name:'Tiếp tục: Chọn câu hỏi'}));
     await user.click(await screen.findByRole('checkbox',{name:new RegExp(exercise.questions[0].question.content.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))}));
-    await user.click(screen.getByRole('checkbox',{name:/Minh Anh/}));await user.click(screen.getByRole('button',{name:'Lưu bài nháp'}));
+    await user.click(screen.getByRole('button',{name:'Tiếp tục: Đặt tên bài'}));
+    await user.type(screen.getByLabelText(/Tên bài tập/),'Bài tập tuần 1');
+    await user.click(screen.getByRole('button',{name:'Tiếp tục: Kiểm tra & giao'}));
+    expect(save).not.toHaveBeenCalled();expect(publish).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button',{name:'Giao bài ngay'}));
     await waitFor(()=>expect(save).toHaveBeenCalledWith({title:'Bài tập tuần 1',instructions:'',questionIds:[demoBank[0].id],studentIds:['student-1']},undefined));
-    expect(publish).not.toHaveBeenCalled();await user.click(await screen.findByRole('button',{name:'Giao bài cho học sinh'}));
     await waitFor(()=>expect(publish).toHaveBeenCalledWith('exercise-1'));
   });
   it('blocks assignment when a selected question still awaits admin approval',async()=>{

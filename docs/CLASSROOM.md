@@ -21,10 +21,14 @@ Tài khoản cũ chưa đủ thông tin hiển thị rõ `chưa_nhập_tên` / `
 
 Mở **Giao bài tập → Tạo bài tập mới**.
 
-1. Đặt tên, thêm lời dặn, chọn câu trong kho theo thứ tự muốn giao. Bấm **Tự soạn câu hỏi cho bài này** để viết thêm câu ngay trong app.
-2. Chọn học sinh nhận bài, bấm **Lưu bài nháp**. Tối đa 100 câu và 100 học sinh mỗi bài. Bộ chọn có phân trang, giữ lựa chọn giữa các trang; tìm kiếm áp dụng cho trang đang mở.
-3. Xem lại hoặc sửa bản nháp. Câu mới chờ quản trị viên duyệt trong Ngân hàng câu hỏi; giáo viên không tự duyệt được. Bấm **Cập nhật kết quả** sau khi admin duyệt.
-4. Khi tất cả câu đã duyệt, bấm **Giao bài cho học sinh**. Bản nháp không hiện ở phía học sinh. Bài đã giao giữ nguyên nội dung/người nhận để bảo toàn kết quả; tạo bài mới khi cần thay đổi.
+1. **Chọn học sinh:** chọn lớp trước, rồi chọn từng em hoặc **Chọn cả lớp**. Có thể tìm tên không dấu và chọn thêm học sinh ở lớp khác; các lựa chọn được giữ. Nếu chưa có học sinh phụ trách, màn hình dẫn thẳng đến mục Học sinh.
+2. **Chọn câu hỏi:** mặc định chỉ hiện câu đã duyệt, sắp từ dễ đến khó. Lọc theo thì, dạng bài, độ khó hoặc tìm trong toàn bộ ngân hàng, kể cả các trang sau. Mở đáp án/giải thích khi cần; danh sách Nội dung bài tập cho phép đưa câu lên/xuống hoặc bỏ câu để đổi thứ tự.
+3. **Đặt tên bài:** nhập tên bài tập dễ nhận biết và lời dặn nếu cần. Có phần xem trước tên bài như học sinh sẽ nhìn thấy.
+4. **Kiểm tra & giao:** xem lại chính xác người nhận, thứ tự và nội dung câu hỏi. **Giao bài ngay** lưu bài và gửi cho học sinh trong cùng luồng thao tác. **Lưu bản nháp** chỉ lưu để hoàn thiện sau, chưa gửi cho học sinh. Có thể quay lại các bước trước mà không mất lựa chọn.
+
+Mỗi bài tối đa 100 câu và 100 học sinh. Chọn cả lớp không âm thầm lấy 100 em đầu nếu lớp vượt giới hạn; hãy chia thành nhóm nhỏ. Câu tự soạn hoặc bật **Hiện cả câu chờ duyệt** vẫn có thể được chọn để chuẩn bị bản nháp, nhưng nút giao bài bị khóa cho tới khi tất cả câu đã được duyệt. Câu bị từ chối cần bỏ khỏi bài.
+
+Trang ban đầu hiển thị bài đã có và nút tạo mới, không mở sẵn cả một form. Bản nháp và bài đã giao có nhãn riêng, ghi rõ học sinh đã nhận bài hay chưa. Sau khi giao, chỉ xem tiến độ; muốn sửa nội dung phải tạo bài mới để giữ nguyên kết quả. Nếu bước gửi bị mất kết nối sau khi đã lưu, thử giao lại dùng đúng bản nháp đó thay vì tạo thêm bài trùng. Đóng/tải lại trình duyệt khi đang sửa chưa lưu sẽ có nhắc nhở; chuyển bước trong form giữ nguyên nội dung.
 
 Học sinh mở **Bài thầy cô giao** để bắt đầu/làm tiếp. Mỗi câu nộp xong được lưu; tải lại không làm mất tiến độ hoặc tạo quyết định mới cho câu chưa trả lời. Mỗi câu trong bài chỉ nộp một lần. Bài luyện thông thường và bài thầy cô giao được tách riêng.
 

@@ -21,8 +21,9 @@ function pageSteps(path: string, role: Role): GuideStep[] {
     {title:'Ghi nhận rồi lưu',text:'Chọn Có mặt, Vắng, Đi muộn hoặc Có phép cho từng em. Chưa điểm danh được giữ riêng; nhớ bấm Lưu điểm danh.',target:target('attendance-register')},
   ];
   if(path==='/teacher/exercises')return [
-    {title:'Ghép một bài tập',text:'Đặt tên bài, viết lời dặn, chọn câu trong kho hoặc tự soạn thêm, rồi chọn học sinh sẽ nhận bài.',target:target('exercise-compose')},
-    {title:'Kiểm tra trước khi giao',text:'Lưu bản nháp trước. Mọi câu cần được quản trị viên duyệt, sau đó bạn bấm Giao bài cho học sinh.',target:target('exercise-detail')},
+    {title:'Bắt đầu với người nhận',text:'Bấm Tạo bài tập mới. Ở bước 1, chọn lớp và những học sinh sẽ nhận bài. Bạn có thể chọn cả lớp hoặc từng em.',target:'.page-heading'},
+    {title:'Chuẩn bị theo từng bước',text:'Bước 2: lọc và chọn câu hỏi đã duyệt, rồi sắp xếp thứ tự. Bước 3: đặt tên bài và thêm lời dặn. Bạn có thể quay lại mà không mất lựa chọn.',target:target('exercise-compose')},
+    {title:'Xem lại rồi giao bài',text:'Bước 4 hiển thị người nhận và toàn bộ câu hỏi. Bấm Giao bài ngay để gửi; hoặc Lưu bản nháp để hoàn thiện sau. Câu chờ duyệt chỉ được lưu nháp.',target:target('exercise-detail')},
   ];
   if(path.startsWith('/student/exercises'))return [{title:'Bài dành cho bạn',text:'Mở bài thầy cô giao và làm từng câu. Mỗi câu nộp xong được lưu ngay; bạn có thể quay lại làm tiếp.'}];
   if (path === '/teacher/students') return [
