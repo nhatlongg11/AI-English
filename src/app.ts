@@ -12,7 +12,7 @@ import {
   requireStudent,
   newStudentToken,
 } from "./auth.js";
-import { QuestionService, questionInclude } from "./questions.js";
+import { QuestionService, questionInclude, MAX_BULK_REVIEW } from "./questions.js";
 import { DiagnosisService } from "./diagnosis.js";
 import { LearningService } from "./learning.js";
 import { QuestionAuthoringService, importRequestSchema } from './question-authoring.js';
@@ -170,6 +170,24 @@ export async function buildApp(
             skip: query.offset,
           }),
         };
+      });
+      api.post('/ai/questions/bulk-review/preview',async(req)=>{
+        requireRole(req,'admin');
+        const {action,filters}=z.object({
+          action:z.enum(['approve','reject']),
+          filters:z.object({tense:tenseSchema.optional(),search:z.string().trim().max(200).optional()}).strict().default({}),
+        }).strict().parse(req.body);
+        return questions.previewReview(action,req.actor.actorId,filters);
+      });
+      api.post('/ai/questions/bulk-review',{bodyLimit:512*1024},async(req)=>{
+        requireRole(req,'admin');
+        const body=z.object({
+          ids:z.array(z.uuid()).min(1).max(MAX_BULK_REVIEW).refine(ids=>new Set(ids).size===ids.length,'Question IDs must be unique'),
+          action:z.enum(['approve','reject']),note:z.string().trim().min(5).max(500),
+          checkedGrammarAndAnswer:z.boolean().optional(),
+        }).strict().parse(req.body);
+        if(body.action==='approve'&&!body.checkedGrammarAndAnswer)throw new AppError(400,'REVIEW_ATTESTATION_REQUIRED','Administrator must confirm grammar and answer review');
+        return questions.reviewMany(body.ids,body.action==='approve'?'approved':'rejected',req.actor.actorId,body.note);
       });
       for (const [action, status] of [
         ["approve", "approved"],

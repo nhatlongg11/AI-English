@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Eye, Search, Sparkles, Plus, FileUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, Search, Sparkles, Plus, FileUp, ShieldCheck, XCircle } from "lucide-react";
 import { useAuth } from "../auth/context";
 import { useResource } from "../../hooks/use-resource";
 import {
@@ -23,10 +23,11 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { QuestionReview } from "./QuestionReview";
+import { BulkQuestionReview } from './BulkQuestionReview';
 import { ManualQuestion, ImportQuestions } from './QuestionAuthoring';
 import { questionTypeLabels, sourceLabel } from '../../lib/question-files';
 import { topics, topic } from "../../lib/grammar";
-import type { BankQuestion } from "../../types";
+import type { BankQuestion, BulkReviewFilters, ReviewAction, Tense } from "../../types";
 export const statusLabel = {
   draft: "Chờ duyệt",
   approved: "Đã xuất bản",
@@ -41,6 +42,8 @@ export function QuestionBank() {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<BankQuestion | null>(null);
   const [editor,setEditor]=useState<'manual'|'import'|null>(null);
+  const [bulkAction,setBulkAction]=useState<ReviewAction|null>(null);
+  const bulkFilters:BulkReviewFilters={...(tense!=='all'?{tense:tense as Tense}:{}),...(search.trim()?{search:search.trim()}: {})};
   const resource = useResource(`bank:${status}:${tense}:${page}`, () =>
     api.questions(
       `${status !== "all" ? `status=${status}&` : ""}${tense !== "all" ? `tense=${tense}&` : ""}offset=${page * 100}`,
@@ -52,7 +55,7 @@ export function QuestionBank() {
       (tense === "all" || q.tense === tense) &&
       `${q.content} ${q.errorCode}`
         .toLowerCase()
-        .includes(search.toLowerCase()),
+        .includes(search.trim().toLowerCase()),
   );
   function saved(created:BankQuestion[]) {
     setEditor(null);setStatus('draft');setTense('all');setSearch('');setPage(0);resource.reload();
@@ -88,6 +91,7 @@ export function QuestionBank() {
             className="pl-9"
             placeholder="Tìm nội dung hoặc mã lỗi…"
             value={search}
+            maxLength={200}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
@@ -119,6 +123,11 @@ export function QuestionBank() {
           ]}
         />
       </div>
+      {session?.role==='admin'&&!api.demo&&(status==='all'||status==='draft')&&<div className="flex flex-wrap items-center gap-3 mb-5">
+        <Button variant="secondary" onClick={()=>setBulkAction('approve')} disabled={resource.loading||Boolean(resource.error)}><ShieldCheck size={16}/>Duyệt tất cả</Button>
+        <Button variant="outline" onClick={()=>setBulkAction('reject')} disabled={resource.loading||Boolean(resource.error)}><XCircle size={16}/>Từ chối tất cả</Button>
+        <span className="small muted">Tất cả câu chờ duyệt khớp bộ lọc, ở mọi trang.</span>
+      </div>}
       {resource.loading ? (
         <Loading />
       ) : resource.error ? (
@@ -226,6 +235,7 @@ export function QuestionBank() {
       />
       {editor==='manual'&&<ManualQuestion onClose={()=>setEditor(null)} onSaved={saved}/>}
       {editor==='import'&&<ImportQuestions onClose={()=>setEditor(null)} onSaved={saved}/>}
+      {bulkAction&&<BulkQuestionReview action={bulkAction} filters={bulkFilters} onClose={()=>setBulkAction(null)} onReviewed={()=>{setPage(0);resource.reload();}}/>}
     </>
   );
 }

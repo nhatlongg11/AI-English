@@ -48,6 +48,10 @@ export interface BankQuestion extends Omit<PublicQuestion, "options"> {
   createdBy?: string | null;
 }
 export type QuestionDraft = Pick<BankQuestion,'tense'|'difficulty'|'questionType'|'content'|'options'|'correctAnswer'|'explanationVi'|'grammarRule'|'errorCode'>;
+export type ReviewAction = 'approve'|'reject';
+export interface BulkReviewFilters {tense?:Tense;search?:string}
+export interface BulkReviewPreview {ids:string[];matched:number;skippedOwn:number}
+export interface BulkReviewResult {reviewed:number;status:'approved'|'rejected'}
 export interface ImportPreview {
   rows: {row:number;content:string;valid:boolean;duplicate:'bank'|'file'|null;errors:string[]}[];
   invalidCount:number;

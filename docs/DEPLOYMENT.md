@@ -41,6 +41,11 @@ successfully. The API waits for it; the frontend waits for the API health check.
 No demo accounts or example questions are inserted. Log in with a staff token
 from `.env`; admins/teachers can provision students in the application.
 
+To add learning content to a running deployment, load the
+[135-question starter curriculum](STARTER_CURRICULUM.md). The loader reuses the
+existing API container and data volume, so no image rebuild is needed. Questions
+enter the normal administrator review queue before student practice.
+
 The named volume `tenselab_app-data` stores `/app/data/tenselab.db`. Docker overrides
 the local `DATABASE_URL`, `HOST`, and `PORT` to use the volume and container network.
 The frontend image receives no runtime secrets. `.env`, local databases and

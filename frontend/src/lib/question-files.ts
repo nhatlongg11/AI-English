@@ -7,6 +7,7 @@ export const questionTypeLabels = {
   error_correction: "Sửa lỗi / xếp câu",
 };
 const sources: Record<string, string> = {
+  ai_assisted_curriculum: "Học liệu khởi đầu (AI hỗ trợ)",
   teacher_manual: "Tự soạn",
   teacher_import: "Nhập từ tệp",
   gemini: "Gợi ý từ AI",

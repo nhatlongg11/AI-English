@@ -1,5 +1,9 @@
 # TenseLab AI Core
 
+**Starter question bank:** [load 135 original grammar exercises](docs/STARTER_CURRICULUM.md)
+into the running Docker deployment without rebuilding images. Includes answer
+keys and Vietnamese explanations; administrator review precedes publication.
+
 **Docker deployment:** run `docker compose up -d --build` with your configured `.env`.
 The frontend is available at `http://127.0.0.1:8080`; SQLite data persists in a named
 volume. See [deployment, database import, and backups](docs/DEPLOYMENT.md).

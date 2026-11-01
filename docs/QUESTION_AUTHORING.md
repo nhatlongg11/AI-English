@@ -1,5 +1,23 @@
 # Câu hỏi của thầy cô
 
+## Duyệt hoặc từ chối tất cả
+
+Quản trị viên có hai nút **Duyệt tất cả** và **Từ chối tất cả** ở ngân hàng câu
+hỏi khi đang xem tất cả trạng thái hoặc câu chờ duyệt. Thao tác áp dụng cho toàn
+bộ câu **đang chờ duyệt** khớp bộ lọc thì và nội dung tìm kiếm, trên mọi trang.
+Hộp thoại hiển thị số câu thực tế trước khi gửi; mỗi lượt tối đa 5.000 câu.
+
+Nhập ghi chú ít nhất 5 ký tự. Khi duyệt, xác nhận đã kiểm tra ngữ pháp, đáp án,
+độ khó và các lựa chọn cho tất cả câu trong lượt này. Câu do chính quản trị viên
+đang đăng nhập tạo sẽ được bỏ qua khi duyệt và hiển thị số lượng cần một quản
+trị viên khác xem xét. Từ chối không cần xác nhận đáp án, nhưng vẫn cần ghi chú.
+
+Server xử lý toàn bộ danh sách đã xem trước trong một transaction. Nếu có câu
+đã được người khác xử lý hoặc không vượt qua kiểm tra đáp án, không câu nào trong
+lượt đó được đổi trạng thái. Đóng hộp thoại và mở lại để cập nhật danh sách.
+Mỗi câu lưu người duyệt, thời gian và ghi chú; câu mới thêm sau khi mở hộp thoại
+không tự động tham gia lượt đang xác nhận.
+
 Mở **Ngân hàng câu hỏi** bằng tài khoản giáo viên hoặc quản trị viên. Ba cách thêm bài nằm ngay đầu trang: **Tự soạn câu hỏi**, **Nhập từ tệp**, **Tạo với AI**. Hai cách đầu không gọi Gemini.
 
 ## Tự soạn một câu

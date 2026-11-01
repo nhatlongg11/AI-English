@@ -10,6 +10,7 @@ import type {
   Tense,
   QuestionDraft,
   ImportPreview,
+  ReviewAction, BulkReviewFilters, BulkReviewPreview, BulkReviewResult,
   LessonSummary,LessonDetail,AttendanceStatus,ExerciseInput,ExerciseSummary,ExerciseDetail,ExerciseNext,
 } from "../types";
 import {
@@ -22,6 +23,9 @@ import {
 } from "./demo";
 import type {StudyPlanResult,ExplanationResult,LessonPlanResult,LessonPlanInput,InsightsResult} from '../types-ai';
 const messages: Record<string, string> = {
+  BULK_REVIEW_CONFLICT: 'Danh sách câu hỏi đã thay đổi. Hãy đóng hộp thoại và chọn lại; chưa có câu nào được xử lý trong lượt này.',
+  BULK_REVIEW_TOO_LARGE: 'Có hơn 5.000 câu chờ duyệt. Hãy lọc theo thì hoặc nội dung để giảm số câu.',
+  REVIEW_ATTESTATION_REQUIRED: 'Hãy xác nhận đã kiểm tra ngữ pháp và đáp án trước khi duyệt.',
   INSUFFICIENT_LEARNING_DATA:'Chưa có câu trả lời đã chấm để AI nhận xét. Hãy cho học sinh làm bài trước; bạn vẫn có thể soạn giáo án.',
   INVALID_AI_OUTPUT:'AI trả về nội dung chưa đạt yêu cầu. Chưa có nội dung mới được lưu; hãy thử lại sau.',
   QUESTIONS_AWAITING_APPROVAL:'Có câu hỏi đang chờ quản trị viên duyệt. Bạn có thể lưu bản nháp và giao bài sau khi tất cả câu được duyệt.',
@@ -170,6 +174,18 @@ export class ApiClient {
         note,
         checkedGrammarAndAnswer: action === "approve",
       }),
+    });
+  }
+  previewBulkReview(action:ReviewAction,filters:BulkReviewFilters) {
+    this.classroomAccount();
+    return this.request<BulkReviewPreview>('/ai/questions/bulk-review/preview',{
+      method:'POST',body:JSON.stringify({action,filters}),
+    });
+  }
+  bulkReview(ids:string[],action:ReviewAction,note:string,checkedGrammarAndAnswer:boolean) {
+    this.classroomAccount();
+    return this.request<BulkReviewResult>('/ai/questions/bulk-review',{
+      method:'POST',body:JSON.stringify({ids,action,note,checkedGrammarAndAnswer}),
     });
   }
   provision(mode: string, experimentGroup: string, teacherId?:string|null,displayName?:string,className?:string) {
