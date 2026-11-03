@@ -25,6 +25,15 @@ try{
   assert.equal((await request<{lesson:LessonDetail}>(`/teaching/lessons/${lessonId}`,teacher.token)).lesson.records[0]!.status,'unmarked');
   await request(`/teaching/lessons/${lessonId}/attendance`,teacher.token,'PATCH',{records:[{studentId:student.id,status:'present'}]});
   assert.equal((await db.attendanceRecord.findUniqueOrThrow({where:{lessonId_studentId:{lessonId,studentId:student.id}}})).status,'present');
+  const reportBody={reportClassName:'Lớp kiểm tra tạm',vocabularyTotal:15,records:[{studentId:student.id,homeworkStatus:'complete',vocabularyKnown:14,miniTestScore:5.5}]};
+  await request(`/teaching/lessons/${lessonId}/report`,teacher.token,'PATCH',reportBody);
+  const report=(await request<{lesson:LessonDetail}>(`/teaching/lessons/${lessonId}`,teacher.token)).lesson;
+  assert.equal(report.vocabularyTotal,15);assert.equal(report.records[0]!.vocabularyKnown,14);assert.equal(report.records[0]!.miniTestScore,5.5);assert.equal(report.records[0]!.status,'present');
+  const savedReport=await db.attendanceRecord.findUniqueOrThrow({where:{lessonId_studentId:{lessonId,studentId:student.id}}});
+  assert.equal(savedReport.homeworkStatus,'complete');assert.equal(savedReport.vocabularyKnown,14);assert.equal(savedReport.miniTestScore,5.5);assert(savedReport.reportedAt);
+  await request(`/teaching/lessons/${lessonId}/report`,teacher.token,'PATCH',{...reportBody,records:[{...reportBody.records[0],vocabularyKnown:16}]},400);
+  await request(`/teaching/lessons/${lessonId}/report`,student.token,'PATCH',reportBody,403);
+  assert.equal((await db.attendanceRecord.findUniqueOrThrow({where:{lessonId_studentId:{lessonId,studentId:student.id}}})).vocabularyKnown,14);
   await request('/teaching/lessons',student.token,'GET',undefined,403);
   const exercise=await request<{exercise:{id:string}}>('/teaching/exercises',teacher.token,'POST',{title:'Temporary classroom verification',instructions:'Answer the approved question.',questionIds:[q.id],studentIds:[student.id]},201);exerciseId=exercise.exercise.id;
   assert.equal((await request<{exercises:unknown[]}>('/learning/exercises',student.token)).exercises.length,0);
@@ -36,7 +45,7 @@ try{
   const detail=await request<{exercise:{recipients:{answered:number;correct:number}[]}}>(`/teaching/exercises/${exerciseId}`,teacher.token);assert.equal(detail.exercise.recipients[0]!.answered,1);assert.equal(detail.exercise.recipients[0]!.correct,1);
   const attempt=await db.attempt.findFirstOrThrow({where:{studentId:student.id},include:{decision:true}});assert.equal(attempt.decision.exerciseId,exerciseId);
   assert.equal(await db.aiUsage.count(),usage);
-  const evidence={checkedAt:new Date().toISOString(),frontend:'Vite',backend:'Fastify',database:'existing SQLite',attendanceSaved:true,exerciseAssigned:true,questionProvenance:q.provenance,questionId:q.id,answerCorrect:result.correct,resumeStable:true,completionPersisted:true,teacherProgressVerified:true,newAiCalls:0,temporaryDataRemoved:true};
+  const evidence={checkedAt:new Date().toISOString(),frontend:'Vite',backend:'Fastify',database:'existing SQLite',attendanceSaved:true,lessonReportPersisted:true,reportScoresValidated:true,studentReportAccessDenied:true,exerciseAssigned:true,questionProvenance:q.provenance,questionId:q.id,answerCorrect:result.correct,resumeStable:true,completionPersisted:true,teacherProgressVerified:true,newAiCalls:0,temporaryDataRemoved:true};
   await db.exercise.delete({where:{id:exerciseId}});exerciseId=undefined;
   await db.attendanceLesson.delete({where:{id:lessonId}});lessonId=undefined;
   await request(`/learning/students/${student.id}`,admin.token,'DELETE',undefined,204);studentId=undefined;

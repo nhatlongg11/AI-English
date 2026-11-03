@@ -1,8 +1,10 @@
 export type Role = "student" | "teacher" | "admin";
 export type AttendanceStatus='unmarked'|'present'|'absent'|'late'|'excused';
+export type HomeworkStatus='unmarked'|'complete'|'partial'|'missing';
+export interface LessonReportInput {reportClassName:string|null;vocabularyTotal:number|null;records:{studentId:string;homeworkStatus:HomeworkStatus;vocabularyKnown:number|null;miniTestScore:number|null}[]}
 export interface ClassroomStudent {id:string;displayName:string|null;className?:string|null;teacherId:string|null}
-export interface LessonSummary {id:string;title:string;heldOn:string;createdBy:string;createdAt:string;total:number;marked:number}
-export interface LessonDetail extends LessonSummary {records:{studentId:string;status:AttendanceStatus;markedAt:string|null;markedBy:string|null;student:ClassroomStudent}[]}
+export interface LessonSummary {id:string;title:string;heldOn:string;createdBy:string;createdAt:string;total:number;marked:number;reportClassName:string|null;vocabularyTotal:number|null}
+export interface LessonDetail extends LessonSummary {records:(LessonReportInput['records'][number]&{status:AttendanceStatus;markedAt:string|null;markedBy:string|null;reportedAt:string|null;reportedBy:string|null;student:ClassroomStudent})[]}
 export interface ExerciseInput {title:string;instructions:string;questionIds:string[];studentIds:string[]}
 export interface ExerciseSummary {id:string;title:string;instructions:string;publishedAt:string|null;questionCount:number;studentCount?:number;answered?:number;correct?:number;pending?:number}
 export interface ExerciseDetail extends ExerciseSummary {questions:{questionId:string;position:number;question:BankQuestion}[];recipients:{studentId:string;student:ClassroomStudent;answered:number;correct:number;pending:number}[]}

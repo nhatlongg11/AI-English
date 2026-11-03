@@ -133,6 +133,8 @@ model AttendanceLesson {
   heldOn    String
   createdBy String
   createdAt DateTime @default(now())
+  reportClassName String?
+  vocabularyTotal Int?
   records   AttendanceRecord[]
   @@index([createdBy, heldOn])
 }
@@ -144,6 +146,11 @@ model AttendanceRecord {
   status String @default("unmarked")
   markedBy String?
   markedAt DateTime?
+  homeworkStatus String @default("unmarked")
+  vocabularyKnown Int?
+  miniTestScore Float?
+  reportedBy String?
+  reportedAt DateTime?
   @@id([lessonId, studentId])
 }
 model Exercise {

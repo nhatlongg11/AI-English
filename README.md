@@ -87,6 +87,7 @@ Remove-Item Env:RUN_LIVE_GEMINI
 - [Thuật toán thích ứng và baseline](docs/ADAPTIVE_ALGORITHM.md)
 - [Kế hoạch đánh giá](docs/AI_EVALUATION_PLAN.md)
 - [API và phân quyền](docs/API_REFERENCE.md)
+- [Điểm danh, báo cáo buổi học và giao bài](docs/CLASSROOM.md)
 - `src/`: API, cấu hình, Gemini, prompts, schemas, ngân hàng câu hỏi, chẩn đoán, thuật toán, xác thực.
 - `prisma/`: schema và migration SQL; `tests/`: kiểm thử đơn vị/tích hợp và 30 ví dụ; `scripts/`: seed/demo/live smoke; `api/`: request collection.
 

@@ -17,6 +17,25 @@ Form tạo mã yêu cầu **Họ và tên** và **Lớp**. Bấm **Sửa họ t�
 
 Tài khoản cũ chưa đủ thông tin hiển thị rõ `chưa_nhập_tên` / `chưa_nhập_lớp`, không đoán tên hay lớp. Hai tài khoản seed đã có tên **Học sinh thử 1/2**, lớp **Lớp thử**, theo lựa chọn của người dùng. Seed lại giữ nguyên tên/lớp đã sửa. Tên/lớp không gửi cho Gemini và không nằm trong export nghiên cứu.
 
+## Báo cáo buổi học
+
+Mở **Báo cáo buổi học** trong menu giáo viên hoặc từ trang Điểm danh.
+
+1. Chọn tối đa 10 buổi đã có; có thể chọn tiếp ở trang khác. Báo cáo sắp theo ngày tăng dần, dùng danh sách và điểm danh đã lưu, không tự tạo học sinh hoặc kết quả mẫu.
+2. Bấm **Nhập / sửa kết quả** trên từng buổi. Nhập tên lớp trên báo cáo, tổng số từ (1–500), tình trạng bài tập (**Đầy đủ / Một phần / Cần bổ sung / Chưa kiểm tra**), số từ thuộc và điểm mini test (0–10). Tên lớp trên báo cáo không thay hồ sơ học sinh. Điểm danh vẫn chỉnh trong mục Điểm danh.
+3. **Lưu kết quả** rồi xem thống kê, bảng tên học sinh, thanh điểm từ vựng và mini test. Cột mini test chỉ xuất hiện khi có ít nhất một điểm. Tên thật được ưu tiên; lớp và ID ngắn giúp phân biệt học sinh trùng tên.
+4. Chọn một hoặc nhiều buổi và bấm **In / Lưu PDF**, chọn Save as PDF trong hộp thoại trình duyệt. Bản in ẩn menu và form, dùng màu tím và bảng như mẫu; mỗi buổi sau bắt đầu trên trang mới. Khi có form đang sửa, nút in và đổi lựa chọn bị khóa; Ctrl+P hiển thị lời nhắc lưu, không in báo cáo thiếu phần đang sửa.
+
+Điểm từ vựng = số từ thuộc / tổng số từ × 10. Điểm hiển thị một chữ số thập phân; trung bình tính từ giá trị gốc. **Ô trống không phải 0**, không đưa vào mẫu số trung bình. Điểm 0 đã kiểm tra vẫn được tính. Đi muộn tính có mặt và được đếm riêng; vắng có phép, vắng và chưa điểm danh có thống kê riêng.
+
+Bài tập và điểm kiểm tra trong sổ này do giáo viên ghi nhận, **không suy ra từ lượt đăng nhập hoặc tiến độ bài tập trên app**, không chấm lại bài, không thay mastery và không gọi AI. Vắng không tự xóa điểm đã nhập. Có thể sửa/xóa điểm bằng cách nhập lại hoặc để trống rồi lưu. Hệ thống lưu người và thời gian cập nhật gần nhất, chưa có lịch sử mọi lần sửa. Lưu hoặc hủy trước khi rời trang; điều hướng sang mục khác trong app không tự lưu.
+
+Báo cáo giữ phân quyền của sổ: chủ sổ chỉ xem học sinh còn phụ trách, admin xem đầy đủ; student không truy cập được. Khi đổi tổng số từ, backend kiểm tra cả điểm của học sinh đã chuyển đi để không tạo điểm vượt tổng; nếu xung đột, nhờ admin kiểm tra toàn bộ sổ. Body kiểm tra chặt, update trong một transaction, không nhận người/thời gian cập nhật từ client. Báo cáo có họ tên và điểm cả lớp; chỉ gửi cho người được phép xem, không có liên kết công khai hoặc gửi tự động.
+
+Migration mới `20261103000000_lesson_reports` chỉ thêm cột nullable và trạng thái Chưa kiểm tra mặc định; giữ nguyên điểm danh, tài khoản và lượt làm bài cũ. Khi cập nhật server: sao lưu SQLite, chạy `npm run db:generate`, `npm run db:migrate`, build và khởi động lại. Với Docker Compose hiện có, build lại và chạy init migrations trước API theo hướng dẫn triển khai.
+
+API mới: PATCH `/api/v1/teaching/lessons/:id/report`, teacher chủ sổ/admin, body `{reportClassName: string|null, vocabularyTotal: number|null, records: [{studentId, homeworkStatus, vocabularyKnown: number|null, miniTestScore: number|null}]}`. Từ vựng phải là số nguyên 0–tổng số từ; có điểm thì phải có tổng số từ. `homeworkStatus`: unmarked/complete/partial/missing. GET lesson trả thêm các giá trị và reportedAt/reportedBy. Chỉ ghi các dòng trong body, không thay điểm danh hoặc các dòng còn lại.
+
 ## Tạo và giao bài
 
 Mở **Giao bài tập → Tạo bài tập mới**.
@@ -52,6 +71,7 @@ Prefix `/api/v1`, Bearer token. Danh sách hỗ trợ limit 1–100 (mặc đị
 | GET/POST `/teaching/lessons` | Teacher/admin; POST `{title, heldOn: YYYY-MM-DD, studentIds}` |
 | GET `/teaching/lessons/:id` | Chủ sổ/admin; trạng thái và dấu thời gian |
 | PATCH `/teaching/lessons/:id/attendance` | Chủ sổ/admin; `{records: [{studentId,status}]}`, transaction |
+| PATCH `/teaching/lessons/:id/report` | Chủ sổ/admin; tên lớp, tổng từ, homeworkStatus/vocabularyKnown/miniTestScore; kiểm tra điểm và lưu transaction |
 | GET/POST `/teaching/exercises` | Teacher/admin; POST `{title,instructions,questionIds,studentIds}` tạo draft |
 | GET/PATCH `/teaching/exercises/:id` | Chủ bài/admin; PATCH cùng body tạo, chỉ khi còn draft |
 | POST `/teaching/exercises/:id/publish` | Chủ bài/admin; kiểm tra approval/quyền học sinh, idempotent |

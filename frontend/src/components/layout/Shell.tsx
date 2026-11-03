@@ -63,6 +63,7 @@ export function Shell() {
         { to: "/teacher/dashboard", label: "Tổng quan", icon: LayoutDashboard },
         { to: "/teacher/students", label: "Học sinh", icon: Users },
         { to: "/teacher/attendance", label: "Điểm danh", icon: CalendarCheck },
+        { to: "/teacher/lesson-reports", label: "Báo cáo buổi học", icon: BarChart3 },
         { to: "/teacher/exercises", label: "Giao bài tập", icon: ClipboardList },
         {
           to: "/teacher/question-bank",

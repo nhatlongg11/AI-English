@@ -1,5 +1,6 @@
 import {useEffect,useState,type FormEvent} from 'react';
 import {toast} from 'sonner';
+import {Link} from 'react-router-dom';
 import {useAuth} from '../auth/context';
 import {useResource} from '../../hooks/use-resource';
 import {EmptyState,Loading,Notice,PageHeading,ResourceError} from '../../components/common';
@@ -18,7 +19,7 @@ export function Attendance(){
   const resource=useResource(`lessons:${page}`,()=>api.lessons(page*30));
   const [dirty,setDirty]=useState(false);
   async function create(e:FormEvent){e.preventDefault();if(busy)return;setBusy(true);setError('');try{const result=await api.createLesson({title:title.trim(),heldOn:date,studentIds:students});setSelected(result.lesson.id);setTitle('');setStudents([]);setPage(0);resource.reload();toast.success('Đã mở sổ điểm danh. Các em chưa được đánh dấu có mặt.');}catch(e){setError(e instanceof Error?e.message:'Chưa tạo được buổi học.');}finally{setBusy(false);}}
-  return <><PageHeading title="Điểm danh buổi học" description="Chọn buổi học và ghi nhận có mặt, đi muộn hoặc vắng. Đăng nhập vào app không tự tính là có mặt."/>
+  return <><PageHeading title="Điểm danh buổi học" description="Chọn buổi học và ghi nhận có mặt, đi muộn hoặc vắng. Đăng nhập vào app không tự tính là có mặt."/><Button asChild variant="outline" className="mb-6"><Link to="/teacher/lesson-reports">Báo cáo điểm danh, bài tập & điểm số</Link></Button>
     {api.demo&&<Notice>Đăng nhập bằng mã giáo viên để lưu điểm danh thật.</Notice>}
     <div className="two-col"><Card className="panel" data-guide="lesson-create"><h2>Tạo buổi học</h2><form className="stack" onSubmit={create}>
       <div className="field"><Label htmlFor="lesson-title">Tên buổi học</Label><Input id="lesson-title" required maxLength={120} placeholder="Ví dụ: Ôn thì hiện tại đơn — buổi 1" value={title} onChange={e=>setTitle(e.target.value)}/></div>

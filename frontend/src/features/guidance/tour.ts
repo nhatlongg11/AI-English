@@ -20,6 +20,11 @@ function pageSteps(path: string, role: Role): GuideStep[] {
     {title:'Chọn buổi muốn điểm danh',text:'Bạn có thể quay lại những buổi trước để kiểm tra hoặc sửa ghi nhận.',target:target('lesson-list')},
     {title:'Ghi nhận rồi lưu',text:'Chọn Có mặt, Vắng, Đi muộn hoặc Có phép cho từng em. Chưa điểm danh được giữ riêng; nhớ bấm Lưu điểm danh.',target:target('attendance-register')},
   ];
+  if(path==='/teacher/lesson-reports')return [
+    {title:'Chọn buổi cần báo cáo',text:'Chọn một hoặc nhiều buổi. Điểm danh và danh sách học sinh được lấy từ sổ đã lưu.',target:target('report-picker')},
+    {title:'Ghi nhận kết quả thật',text:'Bấm Nhập / sửa kết quả để ghi bài tập, số từ thuộc và điểm mini test. Để trống nếu chưa kiểm tra; số 0 là điểm đã kiểm tra.',target:target('lesson-report')},
+    {title:'Lưu rồi chia sẻ',text:'Lưu kết quả trước khi bấm In / Lưu PDF. Báo cáo có họ tên và điểm cả lớp, nên chỉ gửi cho người được phép xem.'},
+  ];
   if(path==='/teacher/exercises')return [
     {title:'Bắt đầu với người nhận',text:'Bấm Tạo bài tập mới. Ở bước 1, chọn lớp và những học sinh sẽ nhận bài. Bạn có thể chọn cả lớp hoặc từng em.',target:'.page-heading'},
     {title:'Chuẩn bị theo từng bước',text:'Bước 2: lọc và chọn câu hỏi đã duyệt, rồi sắp xếp thứ tự. Bước 3: đặt tên bài và thêm lời dặn. Bạn có thể quay lại mà không mất lựa chọn.',target:target('exercise-compose')},

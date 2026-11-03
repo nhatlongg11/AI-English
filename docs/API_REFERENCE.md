@@ -2,7 +2,7 @@
 
 Kế hoạch học cá nhân, giải thích đã nộp, giáo án và gợi ý giảng dạy: xem [AI_SUPPORT](AI_SUPPORT.md#api).
 
-API điểm danh theo buổi, tên học sinh và bài tập được giao: xem [CLASSROOM](CLASSROOM.md#api).
+API điểm danh, báo cáo buổi học (bài tập về nhà, từ vựng, mini test), tên học sinh và bài tập được giao: xem [CLASSROOM](CLASSROOM.md#api).
 
 Base URL local: `http://127.0.0.1:3000/api/v1`. Body JSON, tối đa 16 KiB; hai endpoint import cho phép tối đa 512 KiB và 50 câu. Ngoại trừ health, dùng `Authorization: Bearer <token>`. Bộ yêu cầu đầy đủ tại `api/tenselab.http` (REST Client/JetBrains).
 

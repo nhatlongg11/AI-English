@@ -12,7 +12,7 @@ import type {Role,LessonDetail,ExerciseDetail,Feedback} from './types';
 import {studentLabel} from './lib/student-identity';
 
 const student={id:'student-1',displayName:'Minh Anh',className:'8A1',teacherId:'teacher-test',mode:'adaptive',experimentGroup:'general',createdAt:'2026-10-28',total:0,confirmed:0,correct:0};
-const lesson:LessonDetail={id:'lesson-1',title:'Buổi ôn tập',heldOn:'2026-10-28',createdBy:'teacher-test',createdAt:'2026-10-28',total:1,marked:0,records:[{studentId:student.id,student,status:'unmarked',markedAt:null,markedBy:null}]};
+const lesson:LessonDetail={id:'lesson-1',title:'Buổi ôn tập',heldOn:'2026-10-28',createdBy:'teacher-test',createdAt:'2026-10-28',total:1,marked:0,reportClassName:null,vocabularyTotal:null,records:[{studentId:student.id,student,status:'unmarked',markedAt:null,markedBy:null,homeworkStatus:'unmarked',vocabularyKnown:null,miniTestScore:null,reportedAt:null,reportedBy:null}]};
 const exercise:ExerciseDetail={id:'exercise-1',title:'Bài tập tuần 1',instructions:'Đọc kỹ đề.',publishedAt:null,questionCount:1,studentCount:1,questions:[{questionId:demoBank[0].id,position:0,question:{...demoBank[0],status:'approved'}}],recipients:[{studentId:student.id,student,answered:0,correct:0,pending:0}]};
 function mount(element:React.ReactNode,role:Role='teacher',path='/'){
   const api=new ApiClient('real-account-test');return render(<MemoryRouter initialEntries={[path]}><AuthContext.Provider value={{api,session:{role,actorId:'teacher-test'},token:'real-account-test',login:vi.fn(),demo:vi.fn(),logout:vi.fn()}}>{element}</AuthContext.Provider></MemoryRouter>);

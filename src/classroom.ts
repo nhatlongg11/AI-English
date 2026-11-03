@@ -44,6 +44,25 @@ export function classroomRoutes(api:FastifyInstance,db:PrismaClient){
     if(!lesson)throw new AppError(404,'NOT_FOUND','Lesson not found');return {lesson};
   };
   api.get('/teaching/lessons/:id',lessonDetail);
+  api.patch('/teaching/lessons/:id/report',async req=>{
+    requireRole(req,'teacher','admin');const {id}=params.parse(req.params);
+    const data=z.object({
+      reportClassName:z.string().trim().min(1).max(40).nullable(),
+      vocabularyTotal:z.number().int().min(1).max(500).nullable(),
+      records:z.array(z.object({studentId:z.uuid(),homeworkStatus:z.enum(['unmarked','complete','partial','missing']),vocabularyKnown:z.number().int().min(0).max(500).nullable(),miniTestScore:z.number().min(0).max(10).nullable()}).strict()).min(1).max(100).refine(v=>new Set(v.map(r=>r.studentId)).size===v.length,'Duplicate students'),
+    }).strict().refine(v=>v.records.every(r=>r.vocabularyKnown===null||(v.vocabularyTotal!==null&&r.vocabularyKnown<=v.vocabularyTotal)),'Words remembered must not exceed the lesson vocabulary total').parse(req.body);
+    await db.$transaction(async tx=>{
+      if(!await tx.attendanceLesson.findFirst({where:{id,...owner(req.actor)}}))throw new AppError(404,'NOT_FOUND','Lesson not found');
+      await checkStudents(tx,req.actor,data.records.map(r=>r.studentId));
+      const roster=await tx.attendanceRecord.findMany({where:{lessonId:id},select:{studentId:true,vocabularyKnown:true}});
+      if(data.records.some(r=>!roster.some(saved=>saved.studentId===r.studentId)))throw new AppError(400,'INVALID_ROSTER','Student is not on this lesson register');
+      // Include hidden/transferred students when validating a shared vocabulary total.
+      if(roster.some(saved=>{const known=data.records.find(r=>r.studentId===saved.studentId)?.vocabularyKnown;const value=known===undefined?saved.vocabularyKnown:known;return value!==null&&(data.vocabularyTotal===null||value>data.vocabularyTotal);}))throw new AppError(409,'REPORT_TOTAL_CONFLICT','Existing scores exceed this vocabulary total; ask an administrator to review the complete register');
+      await tx.attendanceLesson.update({where:{id},data:{reportClassName:data.reportClassName,vocabularyTotal:data.vocabularyTotal}});
+      for(const {studentId,...record} of data.records)await tx.attendanceRecord.update({where:{lessonId_studentId:{lessonId:id,studentId}},data:{...record,reportedBy:req.actor.actorId,reportedAt:new Date()}});
+    });
+    return lessonDetail(req);
+  });
   api.patch('/teaching/lessons/:id/attendance',async req=>{
     requireRole(req,'teacher','admin');const {id}=params.parse(req.params);
     const {records}=z.object({records:z.array(z.object({studentId:z.uuid(),status}).strict()).min(1).max(100).refine(v=>new Set(v.map(r=>r.studentId)).size===v.length,'Duplicate students')}).strict().parse(req.body);

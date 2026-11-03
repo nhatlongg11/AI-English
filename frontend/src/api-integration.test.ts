@@ -33,6 +33,9 @@ describe('browser API client against the actual Fastify services and SQLite',()=
       const {lesson}=await teacher.createLesson({title:'Grammar lesson',heldOn:'2026-10-28',studentIds:[account.id]});
       expect((await teacher.lesson(lesson.id)).lesson.records[0].status).toBe('unmarked');
       expect((await teacher.markAttendance(lesson.id,[{studentId:account.id,status:'present'}])).lesson.records[0].status).toBe('present');
+      const report=await teacher.saveLessonReport(lesson.id,{reportClassName:'Lớp 7',vocabularyTotal:15,records:[{studentId:account.id,homeworkStatus:'complete',vocabularyKnown:14,miniTestScore:5.5}]});
+      expect(report.lesson.records[0]).toMatchObject({status:'present',vocabularyKnown:14,miniTestScore:5.5,reportedBy:'teacher-test'});
+      expect((await teacher.lesson(lesson.id)).lesson.vocabularyTotal).toBe(15);
       const {exercise}=await teacher.saveExercise({title:'Assigned grammar',instructions:'Read carefully.',questionIds:[q.id],studentIds:[account.id]});
       expect((await student.exercises(0,true)).exercises).toHaveLength(0);
       await teacher.publishExercise(exercise.id);
@@ -50,5 +53,5 @@ describe('browser API client against the actual Fastify services and SQLite',()=
       await admin.request(`/learning/students/${account.id}`,{method:'DELETE'});
       expect((await teacher.students()).students).toHaveLength(0);
     }finally{vi.restoreAllMocks();await app.close();await fixture.cleanup();}
-  });
+  },15000);
 });

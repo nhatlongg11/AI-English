@@ -58,6 +58,7 @@ const Students = lazy(() =>
   import("./features/teacher/Students").then((m) => ({ default: m.Students })),
 );
 const Attendance=lazy(()=>import('./features/teacher/Attendance').then(m=>({default:m.Attendance})));
+const LessonReports=lazy(()=>import('./features/teacher/LessonReports').then(m=>({default:m.LessonReports})));
 const StudyCoach=lazy(()=>import('./features/ai/StudyCoach').then(m=>({default:m.StudyCoach})));
 const TeacherAiTools=lazy(()=>import('./features/ai/TeacherTools').then(m=>({default:m.TeacherAiTools})));
 const Exercises=lazy(()=>import('./features/teacher/Exercises').then(m=>({default:m.Exercises})));
@@ -243,6 +244,7 @@ export function App() {
                 />
                 <Route path="/teacher/students" element={<Students />} />
                 <Route path="/teacher/attendance" element={<Attendance/>}/>
+                <Route path="/teacher/lesson-reports" element={<LessonReports/>}/>
                 <Route path="/teacher/ai-tools" element={<TeacherAiTools/>}/>
                 <Route path="/teacher/exercises" element={<Exercises/>}/>
                 <Route

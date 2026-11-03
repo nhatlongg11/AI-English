@@ -11,7 +11,7 @@ import type {
   QuestionDraft,
   ImportPreview,
   ReviewAction, BulkReviewFilters, BulkReviewPreview, BulkReviewResult,
-  LessonSummary,LessonDetail,AttendanceStatus,ExerciseInput,ExerciseSummary,ExerciseDetail,ExerciseNext,
+  LessonSummary,LessonDetail,LessonReportInput,AttendanceStatus,ExerciseInput,ExerciseSummary,ExerciseDetail,ExerciseNext,
 } from "../types";
 import {
   demoBank,
@@ -23,6 +23,7 @@ import {
 } from "./demo";
 import type {StudyPlanResult,ExplanationResult,LessonPlanResult,LessonPlanInput,InsightsResult} from '../types-ai';
 const messages: Record<string, string> = {
+  REPORT_TOTAL_CONFLICT:'Có điểm từ vựng đã lưu vượt tổng số từ mới. Hãy giữ tổng số từ cũ hoặc nhờ quản trị viên kiểm tra đầy đủ danh sách.',
   BULK_REVIEW_CONFLICT: 'Danh sách câu hỏi đã thay đổi. Hãy đóng hộp thoại và chọn lại; chưa có câu nào được xử lý trong lượt này.',
   BULK_REVIEW_TOO_LARGE: 'Có hơn 5.000 câu chờ duyệt. Hãy lọc theo thì hoặc nội dung để giảm số câu.',
   REVIEW_ATTESTATION_REQUIRED: 'Hãy xác nhận đã kiểm tra ngữ pháp và đáp án trước khi duyệt.',
@@ -222,6 +223,7 @@ export class ApiClient {
   lessons(offset=0){if(this.demo)return Promise.resolve({lessons:[] as LessonSummary[],nextOffset:null as number|null});return this.request<{lessons:LessonSummary[];nextOffset:number|null}>(`/teaching/lessons?limit=30&offset=${offset}`);}
   createLesson(body:{title:string;heldOn:string;studentIds:string[]}){this.classroomAccount();return this.request<{lesson:LessonSummary}>('/teaching/lessons',{method:'POST',body:JSON.stringify(body)});}
   lesson(id:string){this.classroomAccount();return this.request<{lesson:LessonDetail}>(`/teaching/lessons/${id}`);}
+  saveLessonReport(id:string,body:LessonReportInput){this.classroomAccount();return this.request<{lesson:LessonDetail}>(`/teaching/lessons/${id}/report`,{method:'PATCH',body:JSON.stringify(body)});}
   markAttendance(id:string,records:{studentId:string;status:AttendanceStatus}[]){this.classroomAccount();return this.request<{lesson:LessonDetail}>(`/teaching/lessons/${id}/attendance`,{method:'PATCH',body:JSON.stringify({records})});}
   exercises(offset=0,student=false){if(this.demo)return Promise.resolve({exercises:[] as ExerciseSummary[],nextOffset:null as number|null});return this.request<{exercises:ExerciseSummary[];nextOffset:number|null}>(`/${student?'learning':'teaching'}/exercises?limit=30&offset=${offset}`);}
   exercise(id:string){this.classroomAccount();return this.request<{exercise:ExerciseDetail}>(`/teaching/exercises/${id}`);}
